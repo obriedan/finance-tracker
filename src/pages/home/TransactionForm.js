@@ -10,6 +10,7 @@ export default function TransactionForm() {
     e.preventDefault();
     console.log({ name, amount });
   };
+
   return (
     <>
       <h3>Add a Transaction</h3>
@@ -19,7 +20,7 @@ export default function TransactionForm() {
           <input required onChange={(e) => setName(e.target.value)} value={name} type='text' />
         </label>
         <label>
-          <span>Amount (€):(</span>
+          <span>Amount (€):</span>
           <input
             required
             onChange={(e) => setAmount(e.target.value)}
