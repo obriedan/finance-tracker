@@ -14,6 +14,8 @@ const firestoreReducer = (state, action) => {
       return { isPending: true, document: null, success: false, error: null };
     case 'ADDED_DOCUMENT':
       return { isPending: false, document: action.payload, success: true, error: null };
+    case 'DELETED_DOCUMENT':
+      return { isPending: false, document: null, success: true, error: null };
     case 'ERROR':
       return { isPending: false, document: null, success: false, error: action.payload };
     default:
@@ -30,7 +32,7 @@ export const useFirestore = (collection) => {
   const ref = projectFirestore.collection(collection);
 
   // only dispatch if not cancelled
-  const dispatchIfNoteCancelled = (action) => {
+  const dispatchIfNotCancelled = (action) => {
     if (!isCancelled) {
       dispatch(action);
     }
@@ -43,13 +45,21 @@ export const useFirestore = (collection) => {
     try {
       const createdAt = timestamp.fromDate(new Date());
       const addedDocumentRef = await ref.add({ ...document, createdAt });
-      dispatchIfNoteCancelled({ type: 'ADDED_DOCUMENT', payload: addedDocumentRef });
+      dispatchIfNotCancelled({ type: 'ADDED_DOCUMENT', payload: addedDocumentRef });
     } catch (err) {
-      dispatchIfNoteCancelled({ type: 'ERROR', payload: err.message });
+      dispatchIfNotCancelled({ type: 'ERROR', payload: err.message });
     }
   };
 
-  const deleteDocument = async (id) => {};
+  const deleteDocument = async (id) => {
+    dispatchIfNotCancelled({ type: 'IS_PENDING' });
+    try {
+      ref.doc(id).delete();
+      dispatchIfNotCancelled({ type: 'DELETED_DOCUMENT' });
+    } catch (error) {
+      dispatchIfNotCancelled({ type: 'ERROR', payload: 'Could not delete document' });
+    }
+  };
 
   useEffect(() => {
     return () => setIsCancelled(true);
