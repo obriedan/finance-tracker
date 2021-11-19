@@ -12,7 +12,7 @@ export default function Home() {
   const { documents, error } = useCollection(
     'transactions',
     ['uid', '==', user.uid],
-    ['createdAd', 'desc']
+    ['createdAt', 'desc']
   );
 
   return (
